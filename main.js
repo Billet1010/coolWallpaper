@@ -3,8 +3,11 @@ const toggle = document.getElementById("toggle");
 const inside = document.getElementById("inside");
 const topImage = document.getElementById("topImage");
 
+let checkIfFull = [];
 
 let codeMode = false;
+
+let rainbowMode = false;
 
 toggle.addEventListener("click", () => {
 
@@ -48,6 +51,7 @@ mainText.style.color = "#02C202";
 
 for(let i = 0; i < 100; i++){
     arrayList.push(" ");
+    checkIfFull.push(0);
 }
 
 function fillStart(){
@@ -111,6 +115,8 @@ function quickErase(){
 
 }
 
+
+// all rows
 function eraseAllRow(){
     for(let i = 0; i < 100; i++){
         let listString = arrayList[i];
@@ -150,6 +156,59 @@ function fillAllRow(){
 
 }
 
+// run one row
+
+function fillRow(n){
+    let listString = arrayList[n];
+
+    if(checkIfFull[n] == 0){
+
+        if(Math.random() >= 0.75){
+            listString += getRandomJapaneseLetters();
+
+            arrayList[n] = listString;
+        }
+
+        if(listString.length == 40){
+            checkIfFull[n] = 40;
+        }
+
+    }
+
+}
+
+function eraseRow(n){
+    let listString = arrayList[n];
+
+    if(checkIfFull[n] == 40){
+
+        if(Math.random() >= 0.75){
+            listString = listString.substring(1, listString.length - 1);
+
+            arrayList[n] = listString;
+
+
+            const currentRow = document.getElementById("row" + (n + 1));
+
+            const distanceMoved = (41 - listString.length) * 0.05;
+
+            currentRow.style.transform = `translateY(${distanceMoved}rem)`;
+
+        }
+
+        if(listString.length == 0){
+            checkIfFull[n] = 0;
+            returnP(n);
+        }
+
+    }
+
+    
+}
+
+
+
+
 function checkIfAllRowsAreFilled(){
 
     for(let i = 0; i < 100; i++){
@@ -179,6 +238,15 @@ function checkIfAllRowsAreEmpty(){
     }
 
     return true;
+
+}
+
+function returnP(n){
+
+    const currentRow = document.getElementById("row" + (n + 1));
+
+    currentRow.style.transform = "translateY(0rem)";
+
 
 }
 
@@ -221,34 +289,30 @@ let isEmpty = true;
 
 function animate(time){
 
-    if(codeMode){
-        if(checkIfAllRowsAreFilled()){
-            isFull = true;
-            isEmpty = false;
+    if(count % 2 == 0){
+        if(codeMode){
+
+            for(let i = 0; i < 100; i++){
+                fillRow(i);
+                eraseRow(i);
+            }
+            
+            updateScreen();
+        } 
+    }
+
+    if(count == 200){
+        count = 0;
+        if(rainbowMode){
             mainText.style.color = randomColor();
         }
+    }
 
-        if(checkIfAllRowsAreEmpty()){
-            isEmpty = true;
-            isFull = false;
-            mainText.style.color = randomColor();
-            returnPToOrginalPlace();
-        }
-
-        if(!isFull && isEmpty){
-            fillAllRow();
-        }
-
-        if(isFull && !isEmpty){
-            eraseAllRow();
-        }
-        
-
-        updateScreen();
-    } 
+    count++;
 
 
-    //count = 0;
+
+
 
 
     animateFunction = requestAnimationFrame(animate);
