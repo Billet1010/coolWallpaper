@@ -19,7 +19,9 @@ toggle.addEventListener("click", () => {
 function goToBackground(){
 
     inside.style.left = "25%";
-    toggle.style.backgroundColor = "green";
+    toggle.style.backgroundColor = "#f1e1e1";
+    inside.style.backgroundColor = "#02C202";
+    toggle.style.borderColor = "#02c202";
     topImage.style.opacity = "1";
     codeMode = false;
     quickErase();
@@ -31,7 +33,9 @@ function goToCodeMode(){
     
     topImage.style.opacity = "0";
     inside.style.left = "75%";
-    toggle.style.backgroundColor = "red";
+    toggle.style.backgroundColor = "#f1e1e1";
+    inside.style.backgroundColor = "red";
+    toggle.style.borderColor = "red";
     codeMode = true;
 
 }
@@ -40,6 +44,7 @@ let animateFunction;
 let arrayList = [];
 
 const mainText = document.getElementById("mainText");
+mainText.style.color = "#02C202";
 
 for(let i = 0; i < 100; i++){
     arrayList.push(" ");
@@ -73,6 +78,7 @@ function fillStart(){
 // gret random japanese letters and numbers
 function getRandomJapaneseLetters(){
     // Total characters: 10 numbers + 90 Katakana = 100 choices
+    
     const totalChoices = 10 + (0x30FA - 0x30A1 + 1);
     const randomIndex = Math.floor(Math.random() * totalChoices);
 
@@ -86,6 +92,7 @@ function getRandomJapaneseLetters(){
     }
 
     return String.fromCharCode(charCode);
+    
 }
 
 function quickErase(){
@@ -110,10 +117,16 @@ function eraseAllRow(){
 
         if(Math.random() <= 0.25){
             if(listString.length <= 41){
-                
-                const newString = listString.substring(0, listString.length - 1);
 
-                arrayList[i] = newString;
+                const currentRow = document.getElementById("row" + (i + 1));
+                
+                listString = listString.substring(0, listString.length - 1);
+
+                const distanceMoved = (41 - listString.length) * 0.05;
+
+                currentRow.style.transform = `translateY(${distanceMoved}rem)`;
+            
+                arrayList[i] = listString;
 
             }
         }
@@ -181,6 +194,18 @@ function updateScreen(){
 
 }
 
+function returnPToOrginalPlace(){
+
+    for(let i = 0; i < 100; i++){
+
+        const currentRow = document.getElementById("row" + (i + 1));
+
+        currentRow.style.transform = "translateY(0rem)";
+
+    }
+
+}
+
 function randomColor(){
 
     const randomColor = '#' + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0');
@@ -200,11 +225,14 @@ function animate(time){
         if(checkIfAllRowsAreFilled()){
             isFull = true;
             isEmpty = false;
+            mainText.style.color = randomColor();
         }
 
         if(checkIfAllRowsAreEmpty()){
             isEmpty = true;
             isFull = false;
+            mainText.style.color = randomColor();
+            returnPToOrginalPlace();
         }
 
         if(!isFull && isEmpty){
@@ -219,7 +247,9 @@ function animate(time){
         updateScreen();
     } 
 
-    count++;
+
+    //count = 0;
+
 
     animateFunction = requestAnimationFrame(animate);
 
