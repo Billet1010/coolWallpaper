@@ -34,10 +34,48 @@ p {
   margin: 0;
   letter-spacing: 0.01rem;
   line-height: 0.05rem;
-  text-align: center;
-  transition: 3s;
+  contain: layout style paint;
 
 }
+
+#mainText > div > span {
+    display: inline-block;
+    width: 1ch;
+    overflow: hidden;
+    will-change: opacity;
+}
+
+@keyframes fadeAway{
+
+  0%{
+    opacity: 1;
+  }
+
+  100%{
+    opacity: 0;
+  }
+
+}
+
+@keyframes fadeIn{
+  0%{
+    opacity: 0;
+  }
+  100%{
+    opacity: 1;
+  }
+}
+
+.fadeInClass{
+  animation: fadeIn 0.25s;
+  animation-fill-mode: forwards;
+}
+
+.fadeAwayClass{
+  animation: fadeAway 0.5s;
+  animation-fill-mode: forwards;
+}
+
 
 
 #topImage{

@@ -3,11 +3,18 @@ const toggle = document.getElementById("toggle");
 const inside = document.getElementById("inside");
 const topImage = document.getElementById("topImage");
 
+// arrays;
+let checkIfRunning = [];
 let checkIfFull = [];
+let rowLength = [];
+let delay = [];
+let spanArray = []
 
 let codeMode = false;
 
 let rainbowMode = false;
+
+let num = 0;
 
 toggle.addEventListener("click", () => {
 
@@ -28,7 +35,6 @@ function goToBackground(){
     topImage.style.opacity = "1";
     codeMode = false;
     quickErase();
-
 }
 
 function goToCodeMode(){
@@ -47,36 +53,32 @@ let animateFunction;
 let arrayList = [];
 
 const mainText = document.getElementById("mainText");
-mainText.style.color = "#02C202";
+mainText.style.color = " #00979d";
 
+
+// setup
 for(let i = 0; i < 100; i++){
     arrayList.push(" ");
-    checkIfFull.push(0);
-}
+    checkIfFull.push(false);
+    rowLength.push(0);
+    checkIfRunning.push(randomizeRunning());
+    delay.push(0);
 
-function fillStart(){
+    const currentRow = document.getElementById("row" + (i + 1));
+    const rowArray = [];
 
-    let listOfLetters = " ";
-
-    for(let i = 0; i < 100; i++){ 
-
-        let listOfLetters = " ";
-
-        for(let k = 0; k < 100; k++){
-
-            listOfLetters += getRandomJapaneseLetters();
-
-        }
-
-        arrayList.push(listOfLetters);
+    for(let k = 0; k < 40; k++){
+            num++;
+            const span = document.createElement("span");
+            span.textContent = " ";
+            currentRow.append(span);
+            rowArray.push(span);
 
     }
-    
-    animateFunction = requestAnimationFrame(animate);
+
+    spanArray.push(rowArray);
 
 }
-
-//fillStart();
 
 
 // gret random japanese letters and numbers
@@ -99,181 +101,7 @@ function getRandomJapaneseLetters(){
     
 }
 
-function quickErase(){
-
-    let listString = "";
-
-    for(let i = 0; i < 100; i++){
-
-        listString = arrayList[i];
-
-        listString = "";
-
-        arrayList[i] = listString;
-
-    }
-
-}
-
-
-// all rows
-function eraseAllRow(){
-    for(let i = 0; i < 100; i++){
-        let listString = arrayList[i];
-
-        if(Math.random() <= 0.25){
-            if(listString.length <= 41){
-
-                const currentRow = document.getElementById("row" + (i + 1));
-                
-                listString = listString.substring(0, listString.length - 1);
-
-                const distanceMoved = (41 - listString.length) * 0.05;
-
-                currentRow.style.transform = `translateY(${distanceMoved}rem)`;
-            
-                arrayList[i] = listString;
-
-            }
-        }
-    }
-}
-
-function fillAllRow(){
-
-    for(let i = 0; i < 100; i++){
-
-        let listString = arrayList[i];
-
-        if(listString.length < 41){
-            if (Math.random() <= 0.25){
-                listString += getRandomJapaneseLetters();
-
-                arrayList[i] = listString;
-            }
-        }
-    }
-
-}
-
-// run one row
-
-function fillRow(n){
-    let listString = arrayList[n];
-
-    if(checkIfFull[n] == 0){
-
-        if(Math.random() >= 0.75){
-            listString += getRandomJapaneseLetters();
-
-            arrayList[n] = listString;
-        }
-
-        if(listString.length == 40){
-            checkIfFull[n] = 40;
-        }
-
-    }
-
-}
-
-function eraseRow(n){
-    let listString = arrayList[n];
-
-    if(checkIfFull[n] == 40){
-
-        if(Math.random() >= 0.75){
-            listString = listString.substring(1, listString.length - 1);
-
-            arrayList[n] = listString;
-
-
-            const currentRow = document.getElementById("row" + (n + 1));
-
-            const distanceMoved = (41 - listString.length) * 0.05;
-
-            currentRow.style.transform = `translateY(${distanceMoved}rem)`;
-
-        }
-
-        if(listString.length == 0){
-            checkIfFull[n] = 0;
-            returnP(n);
-        }
-
-    }
-
-    
-}
-
-
-
-
-function checkIfAllRowsAreFilled(){
-
-    for(let i = 0; i < 100; i++){
-
-        let listString = arrayList[i];
-
-        if(listString.length != 41){
-            return false;
-        }
-
-    }
-
-    return true;
-
-}
-
-function checkIfAllRowsAreEmpty(){
-
-    for(let i = 0; i < 100; i++){
-
-        let listString = arrayList[i];
-
-        if(listString.length != 0){
-            return false;
-        }
-
-    }
-
-    return true;
-
-}
-
-function returnP(n){
-
-    const currentRow = document.getElementById("row" + (n + 1));
-
-    currentRow.style.transform = "translateY(0rem)";
-
-
-}
-
-function updateScreen(){
-    
-    for(let i = 0; i < 100; i++){
-
-        let currentRow = document.getElementById("row" + (i + 1));
-
-        currentRow.innerHTML = arrayList[i];
-
-    }
-
-}
-
-function returnPToOrginalPlace(){
-
-    for(let i = 0; i < 100; i++){
-
-        const currentRow = document.getElementById("row" + (i + 1));
-
-        currentRow.style.transform = "translateY(0rem)";
-
-    }
-
-}
-
+// random color 
 function randomColor(){
 
     const randomColor = '#' + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0');
@@ -281,26 +109,116 @@ function randomColor(){
     return randomColor;
 }
 
+// randomize the running
+
+function randomizeRunning(){
+
+    if(Math.random() >= 0.995){
+        return true;
+    } else {
+        return false;
+    }
+
+}
+
+
+
+// run one row
+
+function fillRow(n, f){
+
+        // initialize variables
+        let listString = arrayList[n];
+        let listStringLength = listString.length;
+
+    if(f && listStringLength <= 40){
+        let char = getRandomJapaneseLetters();
+
+        const currentSpan = spanArray[n][listStringLength - 1];
+
+        arrayList[n] = listString + char;
+
+        currentSpan.textContent = char;
+
+        currentSpan.classList.add("fadeInClass");
+        
+        rowLength[n] += 1;
+
+    }
+
+}
+
+function eraseRow(n, a, b){
+
+    let listString = arrayList[n];
+    let listStringLength = listString.length;
+    
+    if(listStringLength > 15){
+
+        delay[n] += 1;
+
+    }
+
+    if(delay[n] <= 40){
+        if(listStringLength > 15){
+            const pastSpan = spanArray[n][delay[n] - 1];
+            pastSpan.classList.remove("fadeInClass");
+            pastSpan.classList.add("fadeAwayClass");
+        }
+    }
+    
+    if(delay[n] == 55){
+        
+        checkIfRunning[n] = false;
+        checkIfFull[n] = true;
+        reset(n);
+
+    }
+
+}
+
+function reset(n){
+
+        for(let i = 0; i < 40; i++){
+            const currentSpan = spanArray[n][i];
+            if(currentSpan){
+                currentSpan.textContent = "";
+                currentSpan.classList.remove("fadeAwayClass");
+            }
+        }
+        arrayList[n] = " ";
+        rowLength[n] = 0;
+        delay[n] = 0;
+}
+
+
 let count = 0;
 
 
-let isFull = false;
-let isEmpty = true;
-
 function animate(time){
 
-    if(count % 2 == 0){
+    // main thread or smth
+    if(count % 3 == 0){
         if(codeMode){
-
-            for(let i = 0; i < 100; i++){
-                fillRow(i);
-                eraseRow(i);
-            }
             
-            updateScreen();
-        } 
+            for(let i = 0; i < 100; i++){
+
+
+                fillRow(i, checkIfRunning[i]);
+
+                eraseRow(i);
+
+                if(!checkIfRunning[i]){
+                    if(Math.random() > 0.9975){
+                        checkIfRunning[i] = true;
+                    }
+                }
+
+            }
+        }
     }
 
+    // rainbow mode
     if(count == 200){
         count = 0;
         if(rainbowMode){
